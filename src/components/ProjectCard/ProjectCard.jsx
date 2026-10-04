@@ -8,19 +8,16 @@ import { ArrowUpRight } from "lucide-react";
  * image hasn't been supplied yet, it falls back to a styled placeholder
  * so the layout never breaks — drop a real file at the same path in
  * src/data/projects.js and it will render automatically.
+ *
+ * If the project has a `link`, the entire card becomes clickable and
+ * opens that URL in a new tab.
  */
 export default function ProjectCard({ project, index = 0 }) {
   const [imgError, setImgError] = useState(false);
-  const { name, categories, description, image, alt } = project;
+  const { name, categories, description, image, alt, link } = project;
 
-  return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.55, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
-      className="group"
-    >
+  const content = (
+    <>
       <div className="relative overflow-hidden bg-bg-2 aspect-[4/3] mb-5">
         {!imgError ? (
           <img
@@ -65,6 +62,38 @@ export default function ProjectCard({ project, index = 0 }) {
       <p className="text-sm text-paper-mute leading-relaxed max-w-md">
         {description}
       </p>
+    </>
+  );
+
+  const motionProps = {
+    initial: { opacity: 0, y: 20 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true, margin: "-60px" },
+    transition: {
+      duration: 0.55,
+      delay: index * 0.06,
+      ease: [0.16, 1, 0.3, 1],
+    },
+    className: "group block focus-visible:outline-none",
+  };
+
+  if (link) {
+    return (
+      <motion.a
+        href={link}
+        target="_blank"
+        rel="noreferrer noopener"
+        aria-label={`View ${name} on Instagram (opens in a new tab)`}
+        {...motionProps}
+      >
+        {content}
+      </motion.a>
+    );
+  }
+
+  return (
+    <motion.article {...motionProps} className="group">
+      {content}
     </motion.article>
   );
 }
